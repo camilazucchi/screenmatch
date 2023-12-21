@@ -82,7 +82,7 @@ public class UserInteractionHandler {
 
         episodes.forEach(System.out::println);
 
-        System.out.println("Digite o nome do episódio que você deseja procurar: ");
+        /* System.out.println("Digite o nome do episódio que você deseja procurar: ");
         var titleSnippet = scanner.nextLine();
         Optional<Episode> foundEpisode = episodes.stream()
                 .filter(e -> e.getTitle().toLowerCase().contains(titleSnippet))
@@ -94,7 +94,7 @@ public class UserInteractionHandler {
             System.out.println("Temporada: " + foundEpisode.get().getSeason());
         } else {
             System.out.println("Episódio não encontrado!");
-        }
+        } */
 
         /* System.out.println("A partir de que ano você deseja ver os episódios?");
         var year = scanner.nextInt();
@@ -113,6 +113,27 @@ public class UserInteractionHandler {
                         + " Episódio: " + e.getTitle()
                         + " Data de lançamento: " + e.getReleaseDate().format(dtf)
                 )); */
+
+        /* Esse trecho de código faz uso da API de Streams e Collectors do Java para calcular a média das avaliações
+        * ("rating") por temporada ("season") a partir de uma lista de episódios ("episodes"). */
+        Map<Integer, Double> ratingsPerSeason = episodes.stream()
+                .filter(e -> e.getRating() > 0.0)
+                /* Agrupa os elementos da stream com base no resultado da função "Episode::getSeason". Ele cria um
+                * mapa onde as chaves são os valores retornados pela função "getSeason" e os valores são listas de
+                * episódios que pertencem àquela temporada: */
+                .collect(Collectors.groupingBy(Episode::getSeason,
+                        /* Para cada grupo (temporada), isso calcula a média dos valores retornados pela função
+                        * "Episode::getRating". A média é representada como um "Double".*/
+                        Collectors.averagingDouble(Episode::getRating)));
+        System.out.println(ratingsPerSeason);
+
+        DoubleSummaryStatistics est = episodes.stream()
+                .filter(e -> e.getRating() > 0.0)
+                .collect(Collectors.summarizingDouble(Episode::getRating));
+        System.out.println("Média: " + est.getAverage());
+        System.out.println("Melhor episódio: " + est.getMax());
+        System.out.println("Pior episódio: " + est.getMin());
+        System.out.println("Quantidade de episódios avaliados: " + est.getCount());
 
     }
 }
